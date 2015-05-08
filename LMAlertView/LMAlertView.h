@@ -59,6 +59,7 @@ typedef void (^LMAlertViewDismissWithIndexBlock)(LMAlertView *alertView,NSIntege
 
 - (void)show;
 - (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated;
+- (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated completion:(LMAlertViewDismissWithIndexBlock)completion;
 - (NSInteger)addButtonWithTitle:(NSString *)title;
 - (NSString *)buttonTitleAtIndex:(NSInteger)buttonIndex;
 

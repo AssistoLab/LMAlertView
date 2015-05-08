@@ -531,12 +531,17 @@
 
 - (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated
 {
+	[self dismissWithClickedButtonIndex:buttonIndex animated:animated completion:self.dismissBlock];
+}
+
+- (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated completion:(LMAlertViewDismissWithIndexBlock)completion
+{
 	if ([self.delegate respondsToSelector:@selector(alertView:willDismissWithButtonIndex:)]) {
 		[self.delegate alertView:(UIAlertView *)self willDismissWithButtonIndex:buttonIndex];
 	}
     
 	// Completion block
-	void (^completion)(BOOL finished) = ^(BOOL finished){
+	void (^animationCompletion)(BOOL finished) = ^(BOOL finished){
 		// Temporary bugfix
 		[self removeFromSuperview];
 		
@@ -553,13 +558,13 @@
 			[self.delegate alertView:(UIAlertView *)self didDismissWithButtonIndex:buttonIndex];
 		}
         
-        if (self.dismissBlock) {
-            self.dismissBlock(self,buttonIndex);
+        if (completion) {
+            completion(self,buttonIndex);
         }
 	};
 	
 	if (!animated) {
-		completion(YES);
+		animationCompletion(YES);
 	}
 	
 	[CATransaction begin]; {
@@ -569,7 +574,7 @@
 		kSpringAnimationClassName *modalTransformAnimation = [self springAnimationForKeyPath:@"transform"];
 		modalTransformAnimation.fromValue = [NSValue valueWithCATransform3D:transformFrom];
 		modalTransformAnimation.toValue = [NSValue valueWithCATransform3D:transformTo];
-		modalTransformAnimation.completion = completion;
+		modalTransformAnimation.completion = animationCompletion;
 		self.representationView.layer.transform = transformTo;
 		
 		// Zoom out the modal
